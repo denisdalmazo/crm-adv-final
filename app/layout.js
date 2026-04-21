@@ -1,11 +1,14 @@
 export const metadata = {
-  title: 'CRM Jurídico',
+  title: 'DALMAZO | CRM JURÍDICO',
+  description: 'Sistema de Gestão Ativa',
 }
 
 export default function RootLayout({ children }) {
   return (
     <html lang="pt-br">
-      <body>{children}</body>
+      <body>
+        {children}
+      </body>
     </html>
   )
 }
