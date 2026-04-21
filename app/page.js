@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
-import { Users, Scale, Clock, CheckCircle, Plus, X, Phone, FileText, Filter, MessageCircle } from 'lucide-react';
+import { Users, Scale, Clock, CheckCircle, Plus, X, MessageSquare, Filter } from 'lucide-react';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -55,10 +55,10 @@ export default function CRM() {
     }
   }
 
-  // Função para abrir o WhatsApp
   const openWhatsApp = (lead) => {
-    const cleanPhone = lead.telefone.replace(/\D/g, ''); // Remove parênteses e espaços
-    const message = encodeURIComponent(`Olá ${lead.nome}, aqui é da Dalmazo Advogados. Gostaria de falar sobre o seu caso de ${lead.tipo_acao}. Podemos conversar?`);
+    if (!lead.telefone) return alert("Telefone não cadastrado");
+    const cleanPhone = lead.telefone.replace(/\D/g, '');
+    const message = encodeURIComponent(`Olá ${lead.nome}, aqui é da Dalmazo Advogados. Gostaria de falar sobre o seu caso de ${lead.tipo_acao}.`);
     window.open(`https://wa.me/55${cleanPhone}?text=${message}`, '_blank');
   };
 
@@ -74,61 +74,55 @@ export default function CRM() {
 
   return (
     <div className="min-h-screen bg-slate-900 text-white p-4 md:p-8 font-sans">
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 border-b border-slate-700 pb-6">
+      <header className="flex justify-between items-center mb-8 border-b border-slate-700 pb-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-blue-400 uppercase">Dalmazo Advogados</h1>
-          <p className="text-slate-400 text-sm italic">Gestão Estratégica de Clientes</p>
+          <h1 className="text-2xl font-bold text-blue-400">DALMAZO | CRM</h1>
+          <p className="text-slate-500 text-xs uppercase font-black">Gestão Jurídica Ativa</p>
         </div>
         <button 
           onClick={() => setIsModalOpen(true)}
-          className="bg-blue-600 hover:bg-blue-500 transition-all px-6 py-3 rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-blue-900/30"
+          className="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg font-bold flex items-center gap-2"
         >
-          <Plus size={20} /> Cadastrar Novo Cliente
+          <Plus size={18} /> Novo Lead
         </button>
       </header>
 
-      <main className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard icon={<Users size={20}/>} label="Total de Leads" value={stats.total} color="blue" />
-        <StatCard icon={<Scale size={20}/>} label="Em Triagem" value={stats.triagem} color="yellow" />
-        <StatCard icon={<Clock size={20}/>} label="Aguardando" value={stats.aguardando} color="purple" />
-        <StatCard icon={<CheckCircle size={20}/>} label="Contratos Fechados" value={stats.convertidos} color="green" />
+      <main className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <StatCard label="Total" value={stats.total} color="blue" />
+        <StatCard label="Triagem" value={stats.triagem} color="yellow" />
+        <StatCard label="Espera" value={stats.aguardando} color="purple" />
+        <StatCard label="Contratos" value={stats.convertidos} color="green" />
       </main>
 
-      <section className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden shadow-2xl">
-        <div className="p-6 border-b border-slate-700 bg-slate-800/50 flex justify-between items-center">
-          <h2 className="text-xl font-semibold flex items-center gap-2"><Filter size={18} className="text-blue-400"/> Lista de Atendimento</h2>
-        </div>
+      <section className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-2xl">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-slate-900/50 text-slate-500 text-xs uppercase tracking-widest">
-                <th className="p-5 font-bold text-center">Contato</th>
-                <th className="p-5 font-bold">Nome do Cliente</th>
-                <th className="p-5 font-bold">Área Jurídica</th>
-                <th className="p-5 font-bold text-center">Status Atual</th>
+          <table className="w-full text-left">
+            <thead className="bg-slate-900/50 text-slate-500 text-[10px] uppercase font-black">
+              <tr>
+                <th className="p-4 text-center">Zap</th>
+                <th className="p-4">Nome / Tel</th>
+                <th className="p-4">Área</th>
+                <th className="p-4">Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-700">
-              {loading ? (
-                <tr><td colSpan="4" className="p-20 text-center text-slate-500 italic">Sincronizando com Supabase...</td></tr>
-              ) : leads.map((lead, i) => (
-                <tr key={i} className="hover:bg-slate-700/40 transition-colors group">
-                  <td className="p-5 text-center">
+              {leads.map((lead, i) => (
+                <tr key={i} className="hover:bg-slate-700/30">
+                  <td className="p-4 text-center">
                     <button 
                       onClick={() => openWhatsApp(lead)}
-                      className="bg-green-600/20 hover:bg-green-600 text-green-500 hover:text-white p-2 rounded-full transition-all"
-                      title="Chamar no WhatsApp"
+                      className="bg-green-500 hover:bg-green-400 text-slate-900 p-2 rounded-full transition-all inline-flex items-center justify-center"
                     >
-                      <MessageCircle size={20} />
+                      <MessageSquare size={16} fill="currentColor" />
                     </button>
                   </td>
-                  <td className="p-5 font-semibold text-blue-50">
-                    <div>{lead.nome}</div>
-                    <div className="text-[10px] text-slate-500 font-mono">{lead.telefone || '---'}</div>
+                  <td className="p-4">
+                    <div className="font-bold text-sm">{lead.nome}</div>
+                    <div className="text-[10px] text-slate-500">{lead.telefone}</div>
                   </td>
-                  <td className="p-5"><span className="text-slate-300 bg-slate-700/50 border border-slate-600 px-3 py-1 rounded-md text-xs">{lead.tipo_acao}</span></td>
-                  <td className="p-5 text-center">
-                    <span className={`px-3 py-1.5 rounded-full text-[10px] font-bold uppercase border ${getStatusColor(lead.status)}`}>
+                  <td className="p-4 text-xs text-slate-300">{lead.tipo_acao}</td>
+                  <td className="p-4 text-xs">
+                    <span className={`px-2 py-1 rounded-md border font-bold ${getStatusColor(lead.status)}`}>
                       {lead.status}
                     </span>
                   </td>
@@ -139,39 +133,27 @@ export default function CRM() {
         </div>
       </section>
 
-      {/* Modal permanece igual */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 z-50">
-          <div className="bg-slate-800 border border-slate-700 w-full max-w-lg rounded-3xl shadow-2xl animate-in zoom-in duration-150">
-            <div className="flex justify-between items-center p-6 border-b border-slate-700">
-              <h3 className="text-2xl font-bold text-blue-400">Novo Atendimento</h3>
-              <button onClick={() => setIsModalOpen(false)} className="bg-slate-700 p-2 rounded-full hover:text-red-400"><X size={20}/></button>
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-slate-800 border border-slate-700 w-full max-w-md rounded-2xl p-6 shadow-2xl">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-bold">Novo Cliente</h3>
+              <button onClick={() => setIsModalOpen(false)}><X /></button>
             </div>
-            <form onSubmit={handleSubmit} className="p-8 space-y-5">
-              <div className="space-y-4">
-                <div>
-                  <label className="text-xs font-black text-slate-500 uppercase ml-1">Dados Principais</label>
-                  <input required value={nome} onChange={e => setNome(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:ring-2 focus:ring-blue-500 outline-none mt-2" placeholder="Nome completo do cliente" />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <input value={telefone} onChange={e => setTelefone(e.target.value)} className="bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:ring-2 focus:ring-blue-500 outline-none" placeholder="WhatsApp (apenas números)" />
-                  <input value={tipoAcao} onChange={e => setTipoAcao(e.target.value)} className="bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Ex: Trabalhista" />
-                </div>
-                <div>
-                  <label className="text-xs font-black text-slate-500 uppercase ml-1">Status Inicial</label>
-                  <select value={status} onChange={e => setStatus(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:ring-2 focus:ring-blue-500 outline-none mt-2 appearance-none">
-                    <option value="Novo">Novo Lead (Entrada)</option>
-                    <option value="Triagem">Em Triagem / Análise</option>
-                    <option value="Aguardando">Aguardando Documentos</option>
-                    <option value="Convertido">Contrato Fechado</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="text-xs font-black text-slate-500 uppercase ml-1">Breve Relato</label>
-                  <textarea value={descricao} onChange={e => setDescricao(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white h-28 focus:ring-2 focus:ring-blue-500 outline-none mt-2" placeholder="Detalhes do caso..." />
-                </div>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <input required value={nome} onChange={e => setNome(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3" placeholder="Nome" />
+              <div className="grid grid-cols-2 gap-4">
+                <input value={telefone} onChange={e => setTelefone(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3" placeholder="Zap com DDD" />
+                <input value={tipoAcao} onChange={e => setTipoAcao(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3" placeholder="Área" />
               </div>
-              <button type="submit" className="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-2xl font-black text-lg transition-all shadow-xl shadow-blue-900/40 uppercase tracking-widest">Registrar Cliente</button>
+              <select value={status} onChange={e => setStatus(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white">
+                <option value="Novo">Novo</option>
+                <option value="Triagem">Triagem</option>
+                <option value="Aguardando">Aguardando</option>
+                <option value="Convertido">Convertido</option>
+              </select>
+              <textarea value={descricao} onChange={e => setDescricao(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 h-24" placeholder="Notas" />
+              <button type="submit" className="w-full bg-blue-600 py-3 rounded-lg font-bold">Salvar</button>
             </form>
           </div>
         </div>
@@ -180,14 +162,12 @@ export default function CRM() {
   );
 }
 
-function StatCard({ icon, label, value, color }) {
-  const colors = { blue: 'text-blue-400', green: 'text-green-400', yellow: 'text-yellow-400', purple: 'text-purple-400' };
-  const borderColors = { blue: 'border-blue-500/20', green: 'border-green-500/20', yellow: 'border-yellow-500/20', purple: 'border-purple-500/20' };
+function StatCard({ label, value, color }) {
+  const colors = { blue: 'text-blue-400', yellow: 'text-yellow-400', purple: 'text-purple-400', green: 'text-green-400' };
   return (
-    <div className={`bg-slate-800/80 p-6 rounded-2xl border ${borderColors[color]} shadow-sm backdrop-blur-sm`}>
-      <div className={`${colors[color]} mb-4 bg-slate-900 w-10 h-10 flex items-center justify-center rounded-lg`}>{icon}</div>
-      <div className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1">{label}</div>
-      <div className="text-3xl font-bold tracking-tighter">{value}</div>
+    <div className="bg-slate-800 p-4 rounded-xl border border-slate-700">
+      <div className="text-[10px] font-black uppercase text-slate-500">{label}</div>
+      <div className={`text-2xl font-bold ${colors[color]}`}>{value}</div>
     </div>
   );
 }
