@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
-import { Users, Scale, Clock, CheckCircle, Plus, X, Phone, FileText, Filter } from 'lucide-react';
+import { Users, Scale, Clock, CheckCircle, Plus, X, Phone, FileText, Filter, MessageCircle } from 'lucide-react';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -13,14 +13,12 @@ export default function CRM() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   
-  // Estados do formulário
   const [nome, setNome] = useState('');
   const [telefone, setTelefone] = useState('');
   const [tipoAcao, setTipoAcao] = useState('');
   const [status, setStatus] = useState('Novo');
   const [descricao, setDescricao] = useState('');
 
-  // Cálculos dos Contadores
   const stats = {
     total: leads.length,
     triagem: leads.filter(l => l.status === 'Triagem').length,
@@ -56,6 +54,13 @@ export default function CRM() {
       alert("Erro ao salvar: " + error.message);
     }
   }
+
+  // Função para abrir o WhatsApp
+  const openWhatsApp = (lead) => {
+    const cleanPhone = lead.telefone.replace(/\D/g, ''); // Remove parênteses e espaços
+    const message = encodeURIComponent(`Olá ${lead.nome}, aqui é da Dalmazo Advogados. Gostaria de falar sobre o seu caso de ${lead.tipo_acao}. Podemos conversar?`);
+    window.open(`https://wa.me/55${cleanPhone}?text=${message}`, '_blank');
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -97,8 +102,8 @@ export default function CRM() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-900/50 text-slate-500 text-xs uppercase tracking-widest">
+                <th className="p-5 font-bold text-center">Contato</th>
                 <th className="p-5 font-bold">Nome do Cliente</th>
-                <th className="p-5 font-bold">WhatsApp / Tel</th>
                 <th className="p-5 font-bold">Área Jurídica</th>
                 <th className="p-5 font-bold text-center">Status Atual</th>
               </tr>
@@ -108,8 +113,19 @@ export default function CRM() {
                 <tr><td colSpan="4" className="p-20 text-center text-slate-500 italic">Sincronizando com Supabase...</td></tr>
               ) : leads.map((lead, i) => (
                 <tr key={i} className="hover:bg-slate-700/40 transition-colors group">
-                  <td className="p-5 font-semibold text-blue-50 group-hover:text-blue-400 transition-colors">{lead.nome}</td>
-                  <td className="p-5 text-slate-400 font-mono">{lead.telefone || '---'}</td>
+                  <td className="p-5 text-center">
+                    <button 
+                      onClick={() => openWhatsApp(lead)}
+                      className="bg-green-600/20 hover:bg-green-600 text-green-500 hover:text-white p-2 rounded-full transition-all"
+                      title="Chamar no WhatsApp"
+                    >
+                      <MessageCircle size={20} />
+                    </button>
+                  </td>
+                  <td className="p-5 font-semibold text-blue-50">
+                    <div>{lead.nome}</div>
+                    <div className="text-[10px] text-slate-500 font-mono">{lead.telefone || '---'}</div>
+                  </td>
                   <td className="p-5"><span className="text-slate-300 bg-slate-700/50 border border-slate-600 px-3 py-1 rounded-md text-xs">{lead.tipo_acao}</span></td>
                   <td className="p-5 text-center">
                     <span className={`px-3 py-1.5 rounded-full text-[10px] font-bold uppercase border ${getStatusColor(lead.status)}`}>
@@ -123,6 +139,7 @@ export default function CRM() {
         </div>
       </section>
 
+      {/* Modal permanece igual */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 z-50">
           <div className="bg-slate-800 border border-slate-700 w-full max-w-lg rounded-3xl shadow-2xl animate-in zoom-in duration-150">
@@ -137,7 +154,7 @@ export default function CRM() {
                   <input required value={nome} onChange={e => setNome(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:ring-2 focus:ring-blue-500 outline-none mt-2" placeholder="Nome completo do cliente" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                  <input value={telefone} onChange={e => setTelefone(e.target.value)} className="bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:ring-2 focus:ring-blue-500 outline-none" placeholder="WhatsApp" />
+                  <input value={telefone} onChange={e => setTelefone(e.target.value)} className="bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:ring-2 focus:ring-blue-500 outline-none" placeholder="WhatsApp (apenas números)" />
                   <input value={tipoAcao} onChange={e => setTipoAcao(e.target.value)} className="bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Ex: Trabalhista" />
                 </div>
                 <div>
