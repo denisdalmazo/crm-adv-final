@@ -81,7 +81,7 @@ export default function CRM() {
         </div>
         <button 
           onClick={() => setIsModalOpen(true)}
-          className="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg font-bold flex items-center gap-2"
+          className="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition-all"
         >
           <Plus size={18} /> Novo Lead
         </button>
@@ -102,26 +102,28 @@ export default function CRM() {
                 <th className="p-4 text-center">Zap</th>
                 <th className="p-4">Nome / Tel</th>
                 <th className="p-4">Área</th>
-                <th className="p-4">Status</th>
+                <th className="p-4 text-center">Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-700">
-              {leads.map((lead, i) => (
-                <tr key={i} className="hover:bg-slate-700/30">
+              {loading ? (
+                <tr><td colSpan="4" className="p-10 text-center text-slate-500">Carregando...</td></tr>
+              ) : leads.map((lead, i) => (
+                <tr key={i} className="hover:bg-slate-700/30 transition-colors">
                   <td className="p-4 text-center">
                     <button 
                       onClick={() => openWhatsApp(lead)}
-                      className="bg-green-500 hover:bg-green-400 text-slate-900 p-2 rounded-full transition-all inline-flex items-center justify-center"
+                      className="bg-green-500 hover:bg-green-400 text-slate-900 p-2 rounded-full transition-all inline-flex items-center justify-center shadow-lg shadow-green-900/20"
                     >
                       <MessageSquare size={16} fill="currentColor" />
                     </button>
                   </td>
                   <td className="p-4">
-                    <div className="font-bold text-sm">{lead.nome}</div>
-                    <div className="text-[10px] text-slate-500">{lead.telefone}</div>
+                    <div className="font-bold text-sm text-blue-50">{lead.nome}</div>
+                    <div className="text-[10px] text-slate-500 font-mono">{lead.telefone}</div>
                   </td>
                   <td className="p-4 text-xs text-slate-300">{lead.tipo_acao}</td>
-                  <td className="p-4 text-xs">
+                  <td className="p-4 text-center text-xs">
                     <span className={`px-2 py-1 rounded-md border font-bold ${getStatusColor(lead.status)}`}>
                       {lead.status}
                     </span>
@@ -135,25 +137,25 @@ export default function CRM() {
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-slate-800 border border-slate-700 w-full max-w-md rounded-2xl p-6 shadow-2xl">
+          <div className="bg-slate-800 border border-slate-700 w-full max-w-md rounded-2xl p-6 shadow-2xl animate-in zoom-in duration-200">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-xl font-bold">Novo Cliente</h3>
-              <button onClick={() => setIsModalOpen(false)}><X /></button>
+              <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-white"><X /></button>
             </div>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <input required value={nome} onChange={e => setNome(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3" placeholder="Nome" />
+              <input required value={nome} onChange={e => setNome(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white outline-none focus:border-blue-500" placeholder="Nome" />
               <div className="grid grid-cols-2 gap-4">
-                <input value={telefone} onChange={e => setTelefone(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3" placeholder="Zap com DDD" />
-                <input value={tipoAcao} onChange={e => setTipoAcao(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3" placeholder="Área" />
+                <input value={telefone} onChange={e => setTelefone(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white outline-none focus:border-blue-500" placeholder="Zap com DDD" />
+                <input value={tipoAcao} onChange={e => setTipoAcao(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white outline-none focus:border-blue-500" placeholder="Área Jurídica" />
               </div>
-              <select value={status} onChange={e => setStatus(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white">
+              <select value={status} onChange={e => setStatus(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white outline-none">
                 <option value="Novo">Novo</option>
                 <option value="Triagem">Triagem</option>
                 <option value="Aguardando">Aguardando</option>
                 <option value="Convertido">Convertido</option>
               </select>
-              <textarea value={descricao} onChange={e => setDescricao(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 h-24" placeholder="Notas" />
-              <button type="submit" className="w-full bg-blue-600 py-3 rounded-lg font-bold">Salvar</button>
+              <textarea value={descricao} onChange={e => setDescricao(e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 h-24 text-white outline-none focus:border-blue-500" placeholder="Notas do caso" />
+              <button type="submit" className="w-full bg-blue-600 hover:bg-blue-500 py-3 rounded-lg font-bold transition-all uppercase tracking-widest text-sm">Salvar Lead</button>
             </form>
           </div>
         </div>
@@ -166,7 +168,7 @@ function StatCard({ label, value, color }) {
   const colors = { blue: 'text-blue-400', yellow: 'text-yellow-400', purple: 'text-purple-400', green: 'text-green-400' };
   return (
     <div className="bg-slate-800 p-4 rounded-xl border border-slate-700">
-      <div className="text-[10px] font-black uppercase text-slate-500">{label}</div>
+      <div className="text-[10px] font-black uppercase text-slate-500 tracking-wider">{label}</div>
       <div className={`text-2xl font-bold ${colors[color]}`}>{value}</div>
     </div>
   );
