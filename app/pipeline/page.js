@@ -1,3 +1,5 @@
+"use client";
+import { useEffect, useState } from "react";
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(
@@ -5,15 +7,24 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 )
 
-export const dynamic = 'force-dynamic'
-export default async function Pipeline() {
-  const { data, error } = await supabase
-    .from('leads')
-    .select('*')
+export default function Pipeline() {
+ const [data, setData] = useState([]);
+  const fetchLeads = async () => {
+  const { data } = await supabase.from("leads").select("*");
+  setData(data);
+};
+  
+ useEffect(() => {
+  fetchLeads();
+}, []);
+  const atualizarStatus = async (id, novoStatus) => {
+  await supabase
+    .from("leads")
+    .update({ status: novoStatus })
+    .eq("id", id);
 
-  if (error) {
-    return <div>Erro ao carregar</div>
-  }
+  fetchLeads();
+};
 
   const colunas = [
     { key: 'novo', label: 'Novo' },
@@ -50,7 +61,20 @@ export default async function Pipeline() {
                   borderRadius: 6
                 }}
               >
-                <strong>{lead.nome}</strong>
+               <strong>{lead.nome}</strong>
+
+<br />
+
+<select
+  value={lead.status}
+  onChange={(e) => atualizarStatus(lead.id, e.target.value)}
+>
+  <option value="novo">Novo</option>
+  <option value="triagem">Triagem</option>
+  <option value="proposta">Proposta</option>
+  <option value="negociacao">Negociação</option>
+  <option value="convertido">Convertido</option>
+</select>
 
                 <div style={{ marginTop: 5 }}>
                   <a
