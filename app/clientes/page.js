@@ -1,91 +1,54 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
-import { Users, Plus, Eye, MessageSquare, Trash2, Search } from 'lucide-react';
-import Link from 'next/link';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
-
-export default function ListaClientes() {
-  const [leads, setLeads] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchLeads() {
-      setLoading(true);
-      const { data } = await supabase
-        .from('leads')
-        .select('*')
-        .order('created_at', { ascending: false });
-      if (data) setLeads(data);
-      setLoading(false);
-    }
-    fetchLeads();
-  }, []);
-
+export default function Dashboard() {
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="fade-up space-y-10">
+      <header className="flex justify-between items-end">
         <div>
-          <h2 className="text-2xl font-bold text-white">Clientes & Leads</h2>
-          <p className="text-slate-500 text-sm">Gerencie sua carteira de clientes e novos contatos.</p>
+          <h1 className="text-4xl font-black text-white tracking-tight">Painel de Controle</h1>
+          <p className="text-slate-500 font-medium">Bem-vindo de volta ao Dalmazo & Co.</p>
         </div>
-        <button className="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition-all">
-          <Plus size={18} /> Novo Cliente
-        </button>
+        <div className="text-right">
+          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest text-blue-500">Status do Servidor</p>
+          <div className="flex items-center gap-2 justify-end">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+            <span className="text-sm font-bold text-white">Sincronizado com Supabase</span>
+          </div>
+        </div>
+      </header>
+
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <StatCard title="Total Clientes" value="48" color="blue" />
+        <StatCard title="Prazos 7 dias" value="12" color="orange" />
+        <StatCard title="Honorários" value="R$ 15.400" color="green" />
+        <StatCard title="Processos" value="34" color="purple" />
       </div>
 
-      <div className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden shadow-2xl">
-        <table className="w-full text-left border-collapse">
-          <thead className="bg-slate-950/50 text-slate-500 text-[10px] uppercase font-black tracking-widest">
-            <tr>
-              <th className="p-4">Cliente / Área</th>
-              <th className="p-4 text-center">Status</th>
-              <th className="p-4 text-right">Ações</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-700">
-            {leads.map((lead) => (
-              <tr key={lead.id} className="hover:bg-slate-700/30 transition-colors group">
-                <td className="p-4">
-                  <div className="font-bold text-white group-hover:text-blue-400 transition-colors">{lead.nome}</div>
-                  <div className="text-[11px] text-slate-500 font-medium uppercase">{lead.tipo_acao || 'Área não definida'}</div>
-                </td>
-                <td className="p-4 text-center">
-                  <span className="px-3 py-1 rounded-full border border-blue-500/20 bg-blue-500/10 text-blue-400 text-[10px] font-black uppercase">
-                    {lead.status}
-                  </span>
-                </td>
-                <td className="p-4">
-                  <div className="flex justify-end gap-2">
-                    {/* ESTE É O LINK QUE ABRE A FICHA DO CLIENTE */}
-                    <Link 
-                      href={`/clientes/${lead.id}`} 
-                      className="p-2 bg-slate-900 text-slate-400 hover:text-white hover:bg-blue-600 rounded-lg transition-all shadow-lg"
-                      title="Ver Ficha e Histórico"
-                    >
-                      <Eye size={18} />
-                    </Link>
-                    
-                    <button className="p-2 bg-slate-900 text-green-500 hover:bg-green-600 hover:text-white rounded-lg transition-all shadow-lg">
-                      <MessageSquare size={18} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        
-        {leads.length === 0 && !loading && (
-          <div className="p-10 text-center text-slate-500 italic">
-            Nenhum cliente encontrado.
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="glass-card p-8 rounded-[2rem]">
+          <h3 className="text-lg font-bold mb-6">Atividade Recente</h3>
+          <div className="space-y-4">
+             {/* Simulação de lista */}
+             {[1,2,3].map(i => (
+               <div key={i} className="flex items-center gap-4 border-b border-white/5 pb-4 last:border-0">
+                 <div className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center text-blue-400 font-bold">D</div>
+                 <div>
+                   <p className="text-sm font-bold">Novo lead registrado</p>
+                   <p className="text-[10px] text-slate-500 uppercase">Há 15 minutos</p>
+                 </div>
+               </div>
+             ))}
           </div>
-        )}
+        </div>
       </div>
+    </div>
+  );
+}
+
+function StatCard({ title, value, color }) {
+  return (
+    <div className="glass-card p-6 rounded-[2rem] hover:scale-105 transition-transform cursor-pointer group">
+      <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2">{title}</p>
+      <p className="text-2xl font-black text-white group-hover:text-blue-500 transition-colors">{value}</p>
     </div>
   );
 }
