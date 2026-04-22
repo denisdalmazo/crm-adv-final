@@ -1,6 +1,6 @@
 import "./globals.css";
 import Link from 'next/link';
-import { LayoutDashboard, Users, Briefcase, Calendar } from "lucide-react";
+import { LayoutDashboard, Users, Briefcase, Calendar, DollarSign, LogOut, Settings } from "lucide-react";
 
 export default function RootLayout({ children }) {
   return (
