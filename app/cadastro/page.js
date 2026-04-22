@@ -12,22 +12,49 @@ export default function Cadastro() {
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
   const [status, setStatus] = useState("novo");
+  const [loading, setLoading] = useState(false);
+
+  const limparTelefone = (tel) => {
+    return tel.replace(/\D/g, ""); // remove tudo que não for número
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!nome.trim()) {
+      alert("Nome obrigatório");
+      return;
+    }
+
+    if (!telefone.trim()) {
+      alert("Telefone obrigatório");
+      return;
+    }
+
+    const telefoneLimpo = limparTelefone(telefone);
+
+    if (telefoneLimpo.length < 10) {
+      alert("Telefone inválido");
+      return;
+    }
+
+    setLoading(true);
+
     const { error } = await supabase.from("leads").insert([
       {
-        nome,
-        telefone,
-        status,
+        nome: nome.trim(),
+        telefone: telefoneLimpo,
+        status: status || "novo",
       },
     ]);
 
+    setLoading(false);
+
     if (error) {
+      console.error(error);
       alert("Erro ao salvar");
     } else {
-      alert("Lead cadastrado");
+      alert("Lead cadastrado com sucesso");
       setNome("");
       setTelefone("");
       setStatus("novo");
@@ -35,7 +62,7 @@ export default function Cadastro() {
   };
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: 20, maxWidth: 400 }}>
       <h1>Cadastrar Lead</h1>
 
       <form onSubmit={handleSubmit}>
@@ -43,19 +70,22 @@ export default function Cadastro() {
           placeholder="Nome"
           value={nome}
           onChange={(e) => setNome(e.target.value)}
+          style={{ width: "100%", padding: 8 }}
         />
         <br /><br />
 
         <input
-          placeholder="Telefone"
+          placeholder="Telefone (com DDD)"
           value={telefone}
           onChange={(e) => setTelefone(e.target.value)}
+          style={{ width: "100%", padding: 8 }}
         />
         <br /><br />
 
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value)}
+          style={{ width: "100%", padding: 8 }}
         >
           <option value="novo">Novo</option>
           <option value="triagem">Triagem</option>
@@ -66,7 +96,19 @@ export default function Cadastro() {
 
         <br /><br />
 
-        <button type="submit">Salvar</button>
+        <button
+          type="submit"
+          disabled={loading}
+          style={{
+            width: "100%",
+            padding: 10,
+            background: loading ? "#ccc" : "#000",
+            color: "#fff",
+            cursor: "pointer",
+          }}
+        >
+          {loading ? "Salvando..." : "Salvar"}
+        </button>
       </form>
     </div>
   );
