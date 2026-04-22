@@ -1,38 +1,3 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-:root {
-  --background: #09090b; /* Fundo mais profundo */
-  --card: #121214;
-  --primary: #3b82f6;
-}
-
-body {
-  background-color: var(--background);
-  color: #ffffff;
-  font-family: 'Inter', system-ui, sans-serif;
-  overflow: hidden;
-}
-
-/* Efeito de Vidro nos Cards */
-.glass-card {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-}
-
-/* Scrollbar invisível mas funcional */
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
-
-/* Animação de entrada */
-.fade-up {
-  animation: fadeUp 0.5s ease-out forwards;
-}
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
