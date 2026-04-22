@@ -2,7 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --background: #0f172a;
+  --foreground: #f8fafc;
+}
+
 body {
-  background-color: #0f172a;
-  color: #f8fafc;
+  color: var(--foreground);
+  background: var(--background);
+  font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+
+/* Remove o sublinhado azul padrão de todos os links */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Garante que o scroll seja suave e escuro */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 10px;
 }
