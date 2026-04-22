@@ -2,15 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  background: radial-gradient(circle at top right, #0f172a, #020617);
-  color: white;
-  min-height: 100 screen;
+:root {
+  --background: #020617;
 }
 
-/* Deixa os cartões com aspecto de vidro */
+body {
+  background: radial-gradient(circle at 50% -20%, #1e293b, #020617);
+  color: #f8fafc;
+  min-height: 100vh;
+}
+
+/* Cartão estilo Potencie/Flowlu Premium */
 .glass-card {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(10px);
+  background: rgba(30, 41, 59, 0.5);
+  backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  transform: translateY(-4px);
 }
